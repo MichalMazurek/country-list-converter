@@ -52,7 +52,23 @@ def main():
                 shutil.copyfile(source_file, out_file)
                 i += 1
 
-        print("Done. Copied %d files" % i)
+        print("Copied %d files" % i)
+        print("Converting...")
+        for json_path in glob.glob(os.path.join(arguments.out_dir, "*.json")):
+
+            with open(json_path, "r") as json_file:
+
+                js_content = u"(function(){ angular.module('maha.countries').config(function(CountriesProvider){" \
+                             u"CountriesProvider.setCountriesList(" + json_file.read() + u");});}).call(this);"
+
+                with open(json_path.replace(".json", ".js"), "w") as js_file:
+                    js_file.write(js_content)
+
+            os.remove(json_path)
+
+        print("Done.")
+
+
 
     else:
         error("Directory: %s does not exist." % arguments.source_dir)
